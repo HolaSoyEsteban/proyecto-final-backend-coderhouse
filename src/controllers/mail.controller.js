@@ -43,3 +43,37 @@ export const getbill = async (req, res) => {
         .then(() => res.status(201).json({ status: 'success' }))
         .catch(error => res.status(500).json({ error }));
 }
+
+export const deletedAccount = async (emailAddresses) => {
+    let configMail = {
+        service: 'gmail',
+        auth: {
+            user: config.mailDelEcommerce,
+            pass: config.mailPasswordDelEcommerce,
+        },
+    };
+    
+    let transporter = nodemailer.createTransport(configMail);
+
+    const results = [];
+
+    // Bucle para enviar correos a todas las direcciones de correo electrónico proporcionadas.
+    for (const email of emailAddresses) {
+        // Se crea el mensaje del correo electrónico
+        let message = {
+            from: config.mailDelEcommerce,
+            to: email,
+            subject: 'Cuenta eliminada por inactividad',
+            html: 'Tu cuenta ha sido eliminada debido a la inactividad.',
+        };
+
+        try {
+            await transporter.sendMail(message);
+            results.push({ email, status: 'Correo electrónico enviado - Cuenta eliminada' });
+        } catch (error) {
+            results.push({ email, status: 'Error al enviar el correo electrónico: ' + error });
+        }
+    }
+
+    return results;
+};

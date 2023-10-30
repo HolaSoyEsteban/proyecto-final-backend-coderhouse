@@ -1,11 +1,23 @@
 import { Router } from "express";
 import UserModel from "../models/user.model.js";
+import { deletedAccount } from '../controllers/mail.controller.js';
+import { isAdmin } from '../public/js/authMiddleware.js';
+import config from '../config/config.js';
 
 
 const router = Router();
 
+router.get('/', isAdmin, async (req, res) => {
+    try {
+        const users = await UserModel.find({}, '-_id first_name last_name email role').lean();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
-router.put('/premium/:uid', async (req, res) => {
+
+router.put('/premium/:uid', isAdmin, async (req, res) => {
     const uid = req.params.uid;
     const { role } = req.body;
 
@@ -72,4 +84,47 @@ router.post('/:uid/documents', async (req, res) => {
     }
 });
 
-export default router;
+router.delete('/', isAdmin, async (req, res) => {
+    // Calcula la fecha límite (2 días atrás)
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+    // esta linea es para probar (con solo 1 minuto atrás)
+    // twoDaysAgo.setMinutes(twoDaysAgo.getMinutes() - 1);
+
+    try {
+        // Email del administrador
+        const adminEmail = config.adminEmail;
+
+        // Busca y elimina a los usuarios que no han tenido conexión en los últimos 2 días
+        const usersToDelete = await UserModel.find({ last_connection: { $lt: twoDaysAgo }, email: { $ne: adminEmail } });
+
+        // Obtener las direcciones de correo electrónico de los usuarios a eliminar
+        const emailAddresses = usersToDelete.map(user => user.email);
+
+        // Llama a la función deletedAccount para enviar notificaciones por correo electrónico
+        const emailResults = await deletedAccount(emailAddresses);
+        
+        // Luego, elimina a los usuarios.
+        const result = await UserModel.deleteMany({ last_connection: { $lt: twoDaysAgo }, email: { $ne: adminEmail } });
+
+        if (result.deletedCount > 0) {
+            // Usuarios eliminados exitosamente.
+            const response = { 
+                message: 'Usuarios eliminados exitosamente.',
+                emailResults: emailResults
+            };
+            res.status(200).json(response);
+        } else {
+            // No se encontraron usuarios para eliminar.
+            const response = { 
+                error: 'No se encontraron usuarios para eliminar.'
+            };
+            res.status(404).json(response);
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+export default router

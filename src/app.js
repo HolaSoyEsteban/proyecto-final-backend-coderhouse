@@ -11,6 +11,7 @@ import mailPurchaseRouter from './routers/mailPurchase.router.js'
 import mockingRouter from './routers/mocking.router.js'
 import loggerTestRouter from './routers/logger.router.js'
 import apiUsersRouter from './routers/apiUsers.router.js'
+import paymentsRouter from './routers/payments.router.js'
 import mongoose from 'mongoose'
 import Message from './models/message.model.js'
 import session from 'express-session'
@@ -124,12 +125,13 @@ try {
   app.use('/chat', chatRouter); // ruta para renderizar la vista de chat
   app.use('/products', viewsRouter); // ruta para renderizar la vista de productos
   app.use('/mockingproducts', mockingRouter); // ruta para generar productos aleatorios con Faker
-  app.use('/api/users', upload.array('files', 20), apiUsersRouter); // ruta para cambiar el role del usuario
+  app.use('/api/users', upload.array('files', 20), apiUsersRouter); // ruta para manejar información de los usuarios
   app.use('/api/products', productsRouter); // registra el router de productos en la ruta /api/products
   app.use('/api/carts', cartsRouter); // registra el router de carritos en la ruta /api/carts
   app.use('/api/sessions', sessionsRouter); // registra el router de sesiones en la ruta /api/sessions
   app.use('/sendMailPurchase', mailPurchaseRouter); // ruta utilizada para enviar el detalle de la compra
   app.use('/loggerTest', loggerTestRouter); // ruta utilizada para probar el log
+  app.use('/payments', paymentsRouter); // ruta utilizada para probar el pago usando Stripe
 
   io.on('connection', socket => {
     logger.info('Nuevo cliente conectado!')
