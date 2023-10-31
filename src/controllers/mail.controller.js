@@ -77,3 +77,32 @@ export const deletedAccount = async (emailAddresses) => {
 
     return results;
 };
+
+export const sendDeletedProductEmail = async (product, userEmail) => {
+    try {
+      let configMail = {
+        service: 'gmail',
+        auth: {
+          user: config.mailDelEcommerce,
+          pass: config.mailPasswordDelEcommerce,
+        },
+      };
+  
+      let transporter = nodemailer.createTransport(configMail);
+  
+      const message = {
+        from: config.mailDelEcommerce,
+        to: product.owner, // El propietario del producto
+        subject: 'Producto eliminado',
+        html: `
+          <p>Estimado usuario,</p>
+          <p>Su producto "${product.title}" ha sido eliminado.</p>
+        `,
+      };
+  
+      await transporter.sendMail(message);
+      return { status: 'Correo electrónico enviado con éxito' };
+    } catch (error) {
+      return { status: 'Error al enviar el correo electrónico: ' + error };
+    }
+  };
