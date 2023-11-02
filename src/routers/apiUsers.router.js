@@ -9,8 +9,12 @@ const router = Router();
 
 router.get('/', isAdmin, async (req, res) => {
     try {
-        const users = await UserModel.find({}, '-_id first_name last_name email role').lean();
-        res.status(200).json(users);
+        const users = await UserModel.find({}, '_id first_name last_name email role status').lean();
+
+        // Se filtra la info del admin para no mostrarla entre los usuarios
+        const filteredUsers = users.filter(user => user.role !== "admin");
+
+        res.status(200).json(filteredUsers);
     } catch (error) {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
@@ -87,6 +91,8 @@ router.post('/:uid/documents', async (req, res) => {
 router.delete('/', isAdmin, async (req, res) => {
     // Calcula la fecha límite (2 días atrás)
     const twoDaysAgo = new Date();
+
+    // Comentar la siguiente linea para probar con la de 1 minuto, y viceversa.
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
     // esta linea es para probar (con solo 1 minuto atrás)
@@ -122,6 +128,40 @@ router.delete('/', isAdmin, async (req, res) => {
             };
             res.status(404).json(response);
         }
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+router.delete('/:uid', isAdmin, async (req, res) => {
+    const uid = req.params.uid;
+
+    try {
+        const user = await UserModel.findOne({ _id: uid });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Verifica si el usuario es el administrador
+        if (user.role === 'admin') {
+            return res.status(400).json({ error: 'No puedes eliminar a un administrador' });
+        }
+        
+        const emailAddress = [user.email]
+
+        // Llama a la función deletedAccount para enviar notificaciones por correo electrónico
+        const emailResults = await deletedAccount(emailAddress);
+
+        const response = {
+            message: 'Usuario eliminado con éxito',
+            userDeleted: user.email
+        }
+
+        const result = await UserModel.deleteOne({ _id: uid });
+        
+        // Si el usuario se ha eliminado exitosamente.
+        res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Error interno del servidor' });
     }

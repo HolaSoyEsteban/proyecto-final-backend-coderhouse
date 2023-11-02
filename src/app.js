@@ -173,6 +173,11 @@ try {
     socket.on('productList', async (data) => {
       io.emit('updatedProducts', data) // emite el evento updatedProducts con la lista de productos
     }) // evento que se ejecuta cuando se actualiza la lista de productos
+
+    socket.on('userList', async (data) => {
+      io.emit('updatedUserList', data) // emite el evento updatedProducts con la lista de productos
+    }) // evento que se ejecuta cuando se actualiza la lista de productos
+
   }) // evento que se ejecuta cuando un cliente se conecta
 } catch (error) {
   logger.error(error.message)
