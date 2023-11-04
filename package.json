@@ -2,7 +2,7 @@
   "name": "proyecto-final-de-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
