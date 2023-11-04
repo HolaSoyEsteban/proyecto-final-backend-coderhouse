@@ -31,6 +31,7 @@
     "supertest": "^6.3.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
+    "vercel": "^32.5.0",
     "winston": "^3.10.0"
   },
   "devDependencies": {
