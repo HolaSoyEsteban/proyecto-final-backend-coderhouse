@@ -131,7 +131,7 @@ try {
   app.use('/api/sessions', sessionsRouter); // registra el router de sesiones en la ruta /api/sessions
   app.use('/sendMailPurchase', mailPurchaseRouter); // ruta utilizada para enviar el detalle de la compra
   app.use('/loggerTest', loggerTestRouter); // ruta utilizada para probar el log
-  app.use('/payments', paymentsRouter); // ruta utilizada para probar el pago usando Stripe
+  // app.use('/payments', paymentsRouter); // ruta utilizada para probar el pago usando Stripe
 
   io.on('connection', socket => {
     logger.info('Nuevo cliente conectado!')
