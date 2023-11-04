@@ -30,7 +30,7 @@ const mongoURL = config.mongoURL
 const mongoDBName = config.mongoDBName
 
 
-export const app = express(); // crea una instancia de una aplicación de express
+const app = express(); // crea una instancia de una aplicación de express
 
 app.use(express.json()); // middleware para parsear el body de las requests a JSON
 
@@ -182,3 +182,5 @@ try {
 } catch (error) {
   logger.error(error.message)
 }
+
+export default app;
