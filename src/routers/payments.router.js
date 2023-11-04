@@ -1,10 +1,10 @@
 import { Router } from 'express'
-// import { createSession } from '../controllers/payments.controller'
+import { createSession, success, cancel } from '../controllers/payments.controller.js';
 
 const router = Router()
 
-// router.get('/create-checkout-session', createSession)
-// router.get('/success', (req, res) => res.send('success'))
-// router.get('/cancel', (req, res) => res.send('cancel'))
+router.get('/create-checkout-session', createSession) // Realiza el envio de los productos del carrito a Stripe
+router.get('/success', success) // Si se realiza la compra
+router.get('/cancel', cancel)   // Si se cancela la compra
 
 export default router
