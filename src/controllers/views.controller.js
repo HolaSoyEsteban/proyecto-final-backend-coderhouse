@@ -73,6 +73,7 @@ export const readViewsCartController = async (req, res) => {
   try {
     const id = req.params.cid
     const result = await cartModel.findById(id).lean().exec();
+
     if (result === null) {
       return res.status(404).json({ status: 'error', error: 'Cart not found' });
     }
