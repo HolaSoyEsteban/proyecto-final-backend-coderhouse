@@ -175,8 +175,8 @@ try {
     }) // evento que se ejecuta cuando se actualiza la lista de productos
 
     socket.on('userList', async (data) => {
-      io.emit('updatedUserList', data) // emite el evento updatedProducts con la lista de productos
-    }) // evento que se ejecuta cuando se actualiza la lista de productos
+      io.emit('updatedUserList', data) // emite el evento updatedUserList con la lista de usuarios
+    }) // evento que se ejecuta para actualizar el rol de usuario
 
   }) // evento que se ejecuta cuando un cliente se conecta
 } catch (error) {
